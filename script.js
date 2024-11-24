@@ -16,16 +16,16 @@ const cpmTag = document.querySelector(".cpm span");
 let timer;
 let maxTime = 60;
 let timeLeft = maxTime;
-let charIndex = (mistakes = isTyping = 0);
+let charIndex = 0, mistakes = 0, isTyping = false;
 
 function loadParagraph() {
   const ranIndex = Math.floor(Math.random() * paragraphs.length);
   typingText.innerHTML = "";
   paragraphs[ranIndex].split("").forEach((char) => {
-    let span = `<span> ${char}</span>`;
+    let span = `<span>${char}</span>`;
     typingText.innerHTML += span;
   });
-  typingText.querySelectorAll("span")[0].classList.add("active");
+  typingText.querySelector("span").classList.add("active");
   document.addEventListener("keydown", () => inpField.focus());
   typingText.addEventListener("click", () => inpField.focus());
 }
@@ -33,7 +33,8 @@ function loadParagraph() {
 function initTyping() {
   let characters = typingText.querySelectorAll("span");
   let typedChar = inpField.value.split("")[charIndex];
-  if (charIndex < characters.length - 1 && timeLeft > 0) {
+
+  if (charIndex < characters.length && timeLeft > 0) {
     if (!isTyping) {
       timer = setInterval(initTimer, 1000);
       isTyping = true;
@@ -47,7 +48,7 @@ function initTyping() {
         characters[charIndex].classList.remove("correct", "incorrect");
       }
     } else {
-      if ((characters[charIndex], innerText == typedChar)) {
+      if (characters[charIndex].innerText === typedChar) {
         characters[charIndex].classList.add("correct");
       } else {
         mistakes++;
@@ -56,7 +57,9 @@ function initTyping() {
       charIndex++;
     }
     characters.forEach((span) => span.classList.remove("active"));
-    characters[charIndex].classList.add("active");
+    if (charIndex < characters.length) {
+      characters[charIndex].classList.add("active");
+    }
 
     let wpm = Math.round(
       ((charIndex - mistakes) / 5 / (maxTime - timeLeft)) * 60
@@ -76,9 +79,6 @@ function initTimer() {
   if (timeLeft > 0) {
     timeLeft--;
     timeTag.innerText = timeLeft;
-    let wpm = Math.ro;
-    ((charIndex - mistakes) / 5 / (maxTime - timeLeft)) * 60;
-    wpmTag.innerText = wpm;
   } else {
     clearInterval(timer);
   }
@@ -88,7 +88,8 @@ function resetGame() {
   loadParagraph();
   clearInterval(timer);
   timeLeft = maxTime;
-  charIndex = mistakes = isTyping = 0;
+  charIndex = mistakes = 0;
+  isTyping = false;
   inpField.value = "";
   timeTag.innerText = timeLeft;
   wpmTag.innerText = 0;
